@@ -1,51 +1,43 @@
-import logo from './logo.svg';
-import './App.css';
-import { Table } from 'react-bootstrap';
-
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import Customers from "./pages/Customers";
+import CustomerDetailPage from "./pages/CustomerDetailPage";
+import Login from "./pages/Login";
+import Register from "./pages/Registration";
+import Layout from "./components/Layout";   // <-- IMPORTANT
+import useAuth from "./hooks/useAuth";
+import { Toaster } from "react-hot-toast";
 
 function App() {
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) return <p>Loading...</p>;
+
   return (
-    <div>
-     <div className="bg-blue-500 text-white p-4">
-      <Table striped bordered hover>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Username</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>1</td>
-            <td>John</td>
-            <td>Doe</td>
-            <td>@johndoe</td>
-            <td><button onClick={() => alert("Button clicked!")} className="bg-red-300 text-white p-2 rounded">Edit</button></td>
-          </tr>
-          <tr>
-            <td>2</td>
-            <td>Jane</td>
-            <td>Smith</td>
-            <td>@janesmith</td>
-            <td><button onClick={() => alert("Button clicked!")} className="bg-red-300 text-white p-2 rounded">Edit</button></td>
-          </tr>
-          <tr>
-            <td>3</td>
-            <td>Bob</td>
-            <td>Johnson</td>
-            <td>@bobjohnson</td>
-            <td><button onClick={() => alert("Button clicked!")} className="bg-red-300 text-white p-2 rounded">Edit</button></td>
-          </tr>
-        </tbody>
-      </Table>
+    <Router>
+      <Routes>
 
-       
+        {/* Public routes */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
-      </div>
-    </div>
+        {/* Protected routes wrapped in Layout */}
+        <Route element={isAuthenticated ? <Layout /> : <Navigate to="/login" />}>
+          <Route path="/customers" element={<Customers />} />
+          <Route path="/customers/:id" element={<CustomerDetailPage />} />
+          {/* Add more pages here */}
+        </Route>
+
+        {/* Default redirect */}
+        <Route
+          path="/"
+          element={
+            isAuthenticated ? <Navigate to="/customers" /> : <Navigate to="/login" />
+          }
+        />
+      </Routes>
+
+      <Toaster position="top-right" reverseOrder={false} />
+    </Router>
   );
 }
 
