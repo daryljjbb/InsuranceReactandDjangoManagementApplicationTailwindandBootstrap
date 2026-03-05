@@ -40,7 +40,19 @@ const Customers = () => {
    const fields = [
      { name: "first_name", label: "First Name", type: "text", required: true },
      { name: "last_name", label: "Last Name", type: "text", required: true },
-     { name: "gender", label: "Gender", type: "select", options: [{ value: "male", label: "Male" }, { value: "female", label: "Female" }, { value: "other", label: "Other" }] },
+     /* Make sure to match backend choices 
+      GENDER_CHOICES = [
+        ("Male", "Male"),
+        ("Female", "Female"),
+        ("Other", "Other"),
+    ]*/
+     { name: "gender", label: "Gender", type: "select",
+        options: [
+            { value: "Male", label: "Male" }, 
+            { value: "Female", label: "Female" },
+            { value: "Other", label: "Other" }
+        ]
+    },
      { name: "email", label: "Email", type: "email", required: true },
      { name: "phone", label: "Phone Number", type: "tel" },
      { name: "address1", label: "Address Line 1", type: "text" },
@@ -166,11 +178,12 @@ const toggleOrdering = (field) => {
                   }}
                 />
                 <td>
-                  <button onClick={() => navigate(`/customers/${customer.id}`)}>View</button>
+                  <button className="bg-blue-300 hover:bg-blue-400 text-white font-bold py-2 px-4 rounded-2xl" onClick={() => navigate(`/customers/${customer.id}`)}>View</button>
                   {isAdmin && (
                     <>
                       <span className="mx-2 text-muted">|</span>
                       <button
+                      className="bg-red-300 hover:bg-red-400 text-white font-bold py-2 px-4 rounded-2xl"
                         size="sm"
                         onClick={() => removeCustomer(customer.id)}
                       >
