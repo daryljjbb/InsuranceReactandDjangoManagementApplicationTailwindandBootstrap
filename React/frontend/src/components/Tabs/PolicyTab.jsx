@@ -4,12 +4,15 @@ import AddPolicyForm from "../AddPolicyForm";
 import EditPolicyForm from "../EditPolicyForm";
 import DeletePolicyModal from "../DeletePolicyModal";
 import PolicyCard from "../PolicyCard";
+import { Table, Button } from "react-bootstrap";
 
 export default function PolicyTab({
   customer,
   addPolicy,
   updatePolicy,
   deletePolicy,
+  payload,
+  id,
   reloadCustomer
 }) {
   const [showAddModal, setShowAddModal] = useState(false);
@@ -38,22 +41,57 @@ export default function PolicyTab({
       {policies.length === 0 ? (
         <p className="text-gray-500">This customer has no policies.</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {policies.map((policy) => (
-            <PolicyCard
-              key={policy.id}
-              policy={policy}
-              onEdit={() => {
-                setSelectedPolicy(policy);
-                setShowEditModal(true);
-              }}
-              onDelete={() => {
-                setSelectedPolicy(policy);
-                setShowDeleteModal(true);
-              }}
-            />
-          ))}
-        </div>
+        <Table striped bordered hover responsive>
+            <thead>
+                <tr>
+                <th>Type</th>
+                <th>Policy #</th>
+                <th>Effective</th>
+                <th>Expires</th>
+                <th>Premium</th>
+                <th>Actions</th>
+                </tr>
+            </thead>
+
+           <tbody>
+                {policies.map((policy) => (
+                    <tr key={policy.id}>
+                    <td>{policy.policy_type}</td>
+                    <td>{policy.policy_number}</td>
+                    <td>{policy.effective_date}</td>
+                    <td>{policy.expiration_date}</td>
+                    <td>${policy.premium_amount}</td>
+                    <td>
+                        <Button
+                        size="sm"
+                        variant="outline-primary"
+                        onClick={() => {
+                            setSelectedPolicy(policy);
+                            setShowEditModal(true);
+                        }}
+                        className="me-2"
+                        >
+                        Edit
+                        </Button>
+
+                        <Button
+                        size="sm"
+                        variant="outline-danger"
+                        onClick={() => {
+                            setSelectedPolicy(policy);
+                            setShowDeleteModal(true);
+                        }}
+                        >
+                        Delete
+                        </Button>
+                    </td>
+                    </tr>
+                ))}
+                </tbody>
+
+
+            </Table>
+
       )}
 
       {/* ADD POLICY MODAL */}
