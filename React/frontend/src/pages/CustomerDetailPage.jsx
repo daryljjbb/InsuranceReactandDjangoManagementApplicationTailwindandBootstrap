@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import useCustomers from "../hooks/useCustomers";
+import usePolicies from "../hooks/usePolicies";
 import useAuth from "../hooks/useAuth";
 
 import OverviewTab from '../components/Tabs/OverviewTab';
+import PolicyTab from '../components/Tabs/PolicyTab';
 
 import { Button } from "react-bootstrap";
 import { Nav } from "react-bootstrap";
@@ -15,6 +17,7 @@ export default function CustomerDetailPage() {
   const { isAuthenticated, isAdmin } = useAuth();
    const {
     customer,
+    reloadCustomer,
     loading,
     error,
   } = useCustomers(isAuthenticated, id); // Pass ID to fetch single customer
@@ -22,6 +25,11 @@ export default function CustomerDetailPage() {
   const [activeTab, setActiveTab] = useState("overview");
 
   const [showRecordModal, setShowRecordModal] = useState(false);
+
+  const { addPolicy, updatePolicy, deletePolicy } = usePolicies(isAuthenticated);
+
+
+
 
   if (loading) {
     return (
@@ -54,12 +62,25 @@ export default function CustomerDetailPage() {
         <Nav.Item>
             <Nav.Link eventKey="overview">Overview</Nav.Link>
         </Nav.Item>
+        <Nav.Item>
+            <Nav.Link eventKey="policies">Policies</Nav.Link>
+        </Nav.Item>
         </Nav>
 
 
       {/* CONTENT AREA */}
       <div className="bg-white p-6 shadow-md rounded-lg min-h-[300px]">
         {activeTab === "overview" && <OverviewTab customer={customer} />}
+        {activeTab === "policies" && (
+       <PolicyTab
+        customer={customer}
+        addPolicy={addPolicy}
+        updatePolicy={updatePolicy}     // ⭐ REQUIRED
+        deletePolicy={deletePolicy}     // ⭐ REQUIRED
+        reloadCustomer={reloadCustomer}
+        />
+        )}
+
 
       </div>
     </div>

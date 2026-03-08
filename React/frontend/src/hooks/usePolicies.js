@@ -1,5 +1,7 @@
 import { useEffect, useState, useCallback} from "react";
 import { fetchPolicies, fetchPolicyById, deletePolicy, createPolicy } from "../api/policies";
+import { updatePolicy as updatePolicyApi } from "../api/policies";
+
 
 const usePolicies = (isAuthenticated, policyId = null) => {
   // Always store policies as an array
@@ -94,18 +96,32 @@ const usePolicies = (isAuthenticated, policyId = null) => {
   /**
    * Add a new policy
    */
-  const addPolicy = async (payload) => {
-    try {
-      const newPolicy = await createPolicy(payload);
+ const addPolicy = async (customerId, payload) => {
+  try {
+    const newPolicy = await createPolicy({
+      ...payload,
+      customer: customerId,
+    });
 
-      // Because we normalized earlier, `prev` is ALWAYS an array
-      setPolicies((prev) => [...prev, newPolicy]);
+    setPolicies((prev) => [...prev, newPolicy]);
 
-    } catch (err) {
-      console.error("Failed to create policy:", err);
-      throw err; // allow form to show errors
-    }
-  };
+    return newPolicy;
+  } catch (err) {
+    console.error("Failed to create policy:", err);
+    throw err;
+  }
+};
+
+
+const updatePolicy = async (id, payload) => {
+  try {
+    const updated = await updatePolicyApi(id, payload);
+    return updated;
+  } catch (err) {
+    console.error("Failed to update policy:", err);
+    throw err;
+  }
+};
 
   /**
    * Remove a policy
@@ -134,6 +150,7 @@ const usePolicies = (isAuthenticated, policyId = null) => {
     setOrdering,
     authError,
     reload: loadPolicies,
+    updatePolicy,
     removePolicy,
     addPolicy,
   };

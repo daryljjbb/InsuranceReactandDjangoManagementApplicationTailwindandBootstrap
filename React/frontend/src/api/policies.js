@@ -18,6 +18,16 @@ export const createPolicy = async (payload) => {
   return res.data;
 };
 
+/**
+ * Update a policy by ID
+ * @param {number} id
+ * @param {object} payload
+ */
+export const updatePolicy = async (id, payload) => {
+  const res = await api.put(`policies/${id}/`, payload);
+  return res.data;
+};
+
 
 /**
  * Delete a policy by ID

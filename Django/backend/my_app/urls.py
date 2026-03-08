@@ -10,6 +10,8 @@ urlpatterns = [
 
     # ✨ ADD THIS LINE: This handles GET /api/customers/1/ (The specific customer)
     path('customers/<int:pk>/', views.CustomerDetailView.as_view()),
+    path('policies/', views.PolicyListCreateView.as_view()),
+    path('policies/<int:pk>/', views.PolicyDetailView.as_view()),
     path('login/', views.api_login, name='api_login'),
     path('logout/', views.api_logout, name='api_logout'),
     path('register/', views.api_register, name='api_register'),

@@ -6,6 +6,12 @@ export default function OverviewTab({ customer }) {
       </div>
     );
   }
+const formatAddress = (c) => {
+  if (!c.address1) return "N/A";
+  return `${c.address1}
+${c.city}, ${c.state} ${c.zip_code}`;
+};
+
 
   return (
     <div className="mt-6 space-y-10">
@@ -29,8 +35,13 @@ export default function OverviewTab({ customer }) {
           <GlassCard label="Phone" value={customer.phone || "N/A"} />
           <GlassCard label="Email" value={customer.email || "N/A"} />
           <div className="md:col-span-2">
-            <GlassCard label="Address" value={customer.address1 || "N/A"} />
-          </div>
+            <GlassCard
+            label="Address"
+            value={<div className="whitespace-pre-line">{formatAddress(customer)}</div>}
+            />
+
+        </div>
+
         </div>
       </section>
 

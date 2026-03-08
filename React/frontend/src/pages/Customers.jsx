@@ -104,7 +104,7 @@ const toggleOrdering = (field) => {
 
 
       <div className="">
-        <button onClick={() => setShowModal(true)}>Add Customer</button>
+        <button className="bg-blue-300 hover:bg-blue-400 text-white font-bold py-2 px-4 rounded-2xl" onClick={() => setShowModal(true)}>Add Customer</button>
       </div>
 
       {/* Modal */}

@@ -6,19 +6,19 @@ from rest_framework import filters # 1. Make sure this is imported
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models.functions import TruncMonth
 from django.db.models import Sum
-from .models import Customer
+from .models import Customer, Policy
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.decorators import api_view, permission_classes
-from .serializers import CustomerSerializer
+from .serializers import CustomerSerializer, PolicySerializer
 from rest_framework import viewsets
 
 # Create your views here.
 # Create your views here.
 # -------------------------------
-# Patient ViewSet
+# Customer ViewSet
 # -------------------------------
 class CustomerListCreateView(generics.ListCreateAPIView):
     serializer_class = CustomerSerializer
@@ -78,6 +78,66 @@ class CustomerDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
 
 
+
+
+# -------------------------------
+# Policy ViewSet
+# -------------------------------
+class PolicyListCreateView(generics.ListCreateAPIView):
+    serializer_class = PolicySerializer
+    # Note: We don't need 'queryset = Policy.objects.all()' anymore 
+    # because get_queryset handles everything.
+
+    def get_queryset(self):
+        user = self.request.user
+        
+        # 1. If user is logged in and is Staff/Admin, show everything
+        if user.is_authenticated and user.is_staff:
+            return Policy.objects.all()
+        
+        # 2. If user is a regular logged-in user (like Daryl), show only their own
+        if user.is_authenticated:
+            return Policy.objects.filter(user=user)
+        # 3. FIX: Changed Invoice.objects.none() to Customer.objects.none()
+        # This ensures guests see an empty list instead of a system error.
+        return Policy.objects.none() 
+
+    def perform_create(self, serializer):
+        # Automatically link the CUSTOMER to whoever is logged in
+        serializer.save(user=self.request.user)
+
+    def get_permissions(self):
+        # POST (Creating) requires a login
+        if self.request.method == "POST":
+            return [permissions.IsAuthenticated()]
+        
+        # GET (Viewing) is allowed for everyone (but guests see an empty list)
+        return [permissions.AllowAny()]
+    
+    # 2. Add filters.SearchFilter to this list
+    filter_backends = [
+        DjangoFilterBackend, 
+        filters.SearchFilter, # <--- Add this!
+        filters.OrderingFilter
+    ]
+
+      # 3. Tell SearchFilter which fields to check when ?search= is in the URL
+    search_fields = ["policy_number","effective_date", "expiration_date"] 
+    
+    filterset_fields = {
+        "policy_number": ["icontains"],                     # optional: search by policy number
+        "effective_date": ["exact"],                    # optional: search by effective date
+        "expiration_date": ["exact"],                    # optional: search by expiration date
+    }
+    ordering_fields = ["policy_number", "effective_date", "expiration_date"]
+    ordering = ["policy_number"]
+
+
+# ✨ NEW Detail View (REQUIRED for /api/policies/1/)
+class PolicyDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Policy.objects.all()
+    serializer_class = PolicySerializer
+    permission_classes = [IsAuthenticated]
 
 
 

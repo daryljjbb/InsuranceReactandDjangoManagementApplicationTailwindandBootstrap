@@ -134,6 +134,7 @@ const useCustomers = (isAuthenticated, customerId = null) => {
     setOrdering,
     authError,
     reload: loadCustomers,
+    reloadCustomer: loadSingleCustomer,   // ⭐ ADD THIS
     removeCustomer,
     addCustomer,
   };

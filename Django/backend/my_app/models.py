@@ -34,4 +34,39 @@ class Customer(models.Model):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
+
+
+class Policy(models.Model):
+
+    POLICY_TYPE = [
+        ("auto", "Auto"),
+        ("home", "Home"),
+        ("life", "Life"),
+    ]
+    customer = models.ForeignKey(
+        Customer,
+        related_name="policies",
+        on_delete=models.CASCADE
+    )
+    policy_number = models.CharField(max_length=255)
+    policy_type = models.CharField(
+        max_length=20,
+        choices=POLICY_TYPE,
+        default="auto"
+    )
+    effective_date = models.DateField()
+    expiration_date = models.DateField()
+    premium_amount = models.DecimalField(max_digits=10, decimal_places=2)
+
+    # This links the invoice to a specific user
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.CASCADE,
+        related_name="policies",
+        null=True, # Allow existing ones to be null for now
+        blank=True
+    )
+
+    def __str__(self):
+        return self.name
     
