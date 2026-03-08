@@ -6,13 +6,13 @@ from rest_framework import filters # 1. Make sure this is imported
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models.functions import TruncMonth
 from django.db.models import Sum
-from .models import Customer, Policy
+from .models import Customer, Policy, Invoice, Payment
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.decorators import api_view, permission_classes
-from .serializers import CustomerSerializer, PolicySerializer
+from .serializers import CustomerSerializer, PolicySerializer, InvoiceSerializer, PaymentSerializer
 from rest_framework import viewsets
 
 # Create your views here.
@@ -141,6 +141,36 @@ class PolicyDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 
 
+class InvoiceViewSet(viewsets.ModelViewSet):
+    serializer_class = InvoiceSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        qs = Invoice.objects.filter(user=self.request.user)
+        policy_id = self.request.query_params.get("policy")
+        if policy_id:
+            qs = qs.filter(policy_id=policy_id)
+        return qs
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class PaymentViewSet(viewsets.ModelViewSet):
+    serializer_class = PaymentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        qs = Payment.objects.filter(user=self.request.user)
+        invoice_id = self.request.query_params.get("invoice")
+        if invoice_id:
+            qs = qs.filter(invoice_id=invoice_id)
+        return qs
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+        
 @api_view(["GET"])
 @permission_classes([AllowAny]) # Changed from IsAuthenticated to AllowAny
 def me(request):

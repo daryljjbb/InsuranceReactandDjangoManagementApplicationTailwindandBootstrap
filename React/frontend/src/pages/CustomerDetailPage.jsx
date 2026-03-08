@@ -6,6 +6,7 @@ import useAuth from "../hooks/useAuth";
 
 import OverviewTab from '../components/Tabs/OverviewTab';
 import PolicyTab from '../components/Tabs/PolicyTab';
+import InvoicesTab from '../components/Tabs/InvoicesTab';
 
 import { Button } from "react-bootstrap";
 import { Nav } from "react-bootstrap";
@@ -65,6 +66,9 @@ export default function CustomerDetailPage() {
         <Nav.Item>
             <Nav.Link eventKey="policies">Policies</Nav.Link>
         </Nav.Item>
+        <Nav.Item>
+            <Nav.Link eventKey="invoices">Invoices</Nav.Link>
+        </Nav.Item>
         </Nav>
 
 
@@ -81,6 +85,12 @@ export default function CustomerDetailPage() {
         />
         )}
 
+        {activeTab === "invoices" && (
+        <InvoicesTab
+            customer={customer}
+            reloadCustomer={reloadCustomer}   // or whatever your reload function is
+        />
+        )}
 
       </div>
     </div>
