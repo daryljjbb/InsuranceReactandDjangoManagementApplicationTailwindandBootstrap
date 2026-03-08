@@ -1,3 +1,4 @@
+import AddPaymentForm from "./AddPaymentForm";
 function PaymentHistory({ invoice, reloadCustomer }) {
   return (
     <div className="p-3 bg-gray-50 rounded">

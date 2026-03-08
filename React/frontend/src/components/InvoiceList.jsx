@@ -1,3 +1,4 @@
+import InvoiceRow from "./InvoiceRow";
 function InvoiceList({ policy, reloadCustomer }) {
   const invoices = policy.invoices || [];
 
@@ -20,6 +21,7 @@ function InvoiceList({ policy, reloadCustomer }) {
         <Table bordered hover responsive>
           <thead>
             <tr>
+              <th></th> {/* arrow column */}
               <th>Invoice #</th>
               <th>Issue</th>
               <th>Due</th>

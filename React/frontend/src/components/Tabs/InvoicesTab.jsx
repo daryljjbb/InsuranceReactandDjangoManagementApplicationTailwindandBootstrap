@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Accordion, Button, Table, Modal } from "react-bootstrap";
 import AddInvoiceForm from "../AddInvoiceForm";
 import AddPaymentForm from "../AddPaymentForm";
+import InvoiceRow from "../InvoiceRow";
+import { FiChevronRight, FiChevronDown } from "react-icons/fi";
 
 function StatusBadge({ status }) {
   const map = {
@@ -49,37 +51,6 @@ function PaymentHistory({ invoice, reloadCustomer }) {
   );
 }
 
-function InvoiceRow({ invoice, reloadCustomer }) {
-  const [expanded, setExpanded] = useState(false);
-
-  return (
-    <>
-      <tr
-        style={{ cursor: "pointer" }}
-        onClick={() => setExpanded((prev) => !prev)}
-      >
-        <td>{invoice.invoice_number}</td>
-        <td>{invoice.issue_date}</td>
-        <td>{invoice.due_date}</td>
-        <td>${invoice.total_amount}</td>
-        <td>${invoice.balance_due}</td>
-        <td>
-          <StatusBadge status={invoice.status} />
-        </td>
-        <td>{invoice.billing_type === "direct" ? "Direct Bill" : "Agency Bill"}</td>
-      </tr>
-
-      {expanded && (
-        <tr>
-          <td colSpan="7">
-            <PaymentHistory invoice={invoice} reloadCustomer={reloadCustomer} />
-          </td>
-        </tr>
-      )}
-    </>
-  );
-}
-
 function PolicyInvoices({ policy, reloadCustomer }) {
   const [showAddInvoice, setShowAddInvoice] = useState(false);
   const invoices = policy.invoices || [];
@@ -99,6 +70,7 @@ function PolicyInvoices({ policy, reloadCustomer }) {
         <Table bordered hover responsive size="sm">
           <thead>
             <tr>
+              <th></th> {/* arrow column */}
               <th>Invoice #</th>
               <th>Issue</th>
               <th>Due</th>
