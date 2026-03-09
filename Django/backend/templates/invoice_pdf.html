@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    h1 { font-size: 24px; }
+    .section { margin-bottom: 20px; }
+    .label { font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <h1>Invoice {{ invoice.invoice_number }}</h1>
+
+  <div class="section">
+    <div class="label">Customer:</div>
+    <div>{{ invoice.policy.customer.first_name }} {{ invoice.policy.customer.last_name }}</div>
+  </div>
+
+  <div class="section">
+    <div class="label">Policy:</div>
+    <div>{{ invoice.policy.policy_number }} — {{ invoice.policy.policy_type }}</div>
+  </div>
+
+  <div class="section">
+    <div class="label">Amount:</div>
+    <div>${{ invoice.total_amount }}</div>
+  </div>
+
+  <div class="section">
+    <div class="label">Balance Due:</div>
+    <div>${{ invoice.balance_due }}</div>
+  </div>
+
+</body>
+</html>

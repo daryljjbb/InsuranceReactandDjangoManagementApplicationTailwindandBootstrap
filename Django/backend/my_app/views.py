@@ -170,7 +170,24 @@ class PaymentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save()
 
-        
+
+    
+from django.template.loader import render_to_string
+from django.http import HttpResponse
+from weasyprint import HTML
+
+
+def invoice_pdf(request, pk):
+    invoice = Invoice.objects.get(pk=pk)
+
+    html_string = render_to_string("invoice_pdf.html", {"invoice": invoice})
+    pdf = HTML(string=html_string).write_pdf()
+
+    response = HttpResponse(pdf, content_type="application/pdf")
+    response["Content-Disposition"] = f'inline; filename="invoice_{invoice.invoice_number}.pdf"'
+    return response
+
+
 @api_view(["GET"])
 @permission_classes([AllowAny]) # Changed from IsAuthenticated to AllowAny
 def me(request):

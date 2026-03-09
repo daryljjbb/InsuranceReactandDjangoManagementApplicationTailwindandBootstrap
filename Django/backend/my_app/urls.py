@@ -3,7 +3,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from . import views
-from .views import InvoiceViewSet, PaymentViewSet
+from .views import InvoiceViewSet, PaymentViewSet,invoice_pdf
 
 router = DefaultRouter()
 router.register(r'invoices', InvoiceViewSet, basename='invoice')
@@ -15,6 +15,9 @@ urlpatterns = [
 
     path('policies/', views.PolicyListCreateView.as_view()),
     path('policies/<int:pk>/', views.PolicyDetailView.as_view()),
+
+    path("invoices/<int:pk>/pdf/", invoice_pdf, name="invoice-pdf"),
+
 
     path('login/', views.api_login, name='api_login'),
     path('logout/', views.api_logout, name='api_logout'),

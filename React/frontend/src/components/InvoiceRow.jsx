@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { FiChevronRight } from "react-icons/fi";
+import { FiFileText } from "react-icons/fi";
+
 import StatusBadge from "./StatusBadge"; // adjust path if needed
 import PaymentHistory from "./PaymentHistory"; // adjust path if needed
 
@@ -39,12 +41,25 @@ function InvoiceRow({ invoice, reloadCustomer }) {
         <td>
           {invoice.billing_type === "direct" ? "Direct Bill" : "Agency Bill"}
         </td>
+        <td>
+        <a
+            href={`http://localhost:8000/api/invoices/${invoice.id}/pdf/`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:text-blue-800"
+            title="Download PDF"
+            onClick={(e) => e.stopPropagation()} // prevents row expand
+        >
+            <FiFileText size={18} />
+        </a>
+        </td>
+
       </tr>
 
       {/* EXPANDED PAYMENT HISTORY */}
       {expanded && (
         <tr>
-          <td colSpan="8">
+          <td colSpan="9">
             <PaymentHistory
               invoice={invoice}
               reloadCustomer={reloadCustomer}
