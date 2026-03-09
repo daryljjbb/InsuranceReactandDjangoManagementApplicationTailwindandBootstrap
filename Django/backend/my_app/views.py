@@ -175,12 +175,22 @@ class PaymentViewSet(viewsets.ModelViewSet):
 from django.template.loader import render_to_string
 from django.http import HttpResponse
 from weasyprint import HTML
+from django.templatetags.static import static
 
 
 def invoice_pdf(request, pk):
     invoice = Invoice.objects.get(pk=pk)
 
-    html_string = render_to_string("invoice_pdf.html", {"invoice": invoice})
+    logo_url = request.build_absolute_uri(static('images/logo.png'))
+
+    html_string = render_to_string(
+        "invoice_pdf.html",
+        {
+            "invoice": invoice,
+            "logo_url": logo_url,
+        }
+    )
+
     pdf = HTML(string=html_string).write_pdf()
 
     response = HttpResponse(pdf, content_type="application/pdf")

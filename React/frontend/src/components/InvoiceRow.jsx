@@ -43,15 +43,22 @@ function InvoiceRow({ invoice, reloadCustomer }) {
         </td>
         <td>
         <a
-            href={`http://localhost:8000/api/invoices/${invoice.id}/pdf/`}
-            target="_blank"
-            rel="noopener noreferrer"
+            href="#"
             className="text-blue-600 hover:text-blue-800"
             title="Download PDF"
-            onClick={(e) => e.stopPropagation()} // prevents row expand
-        >
+            onClick={(e) => {
+                e.stopPropagation();
+                window.open(
+                `http://127.0.0.1:8000/api/invoices/${invoice.id}/pdf/`,
+                "_blank",
+                "noopener,noreferrer"
+                );
+            }}
+            >
             <FiFileText size={18} />
         </a>
+
+
         </td>
 
       </tr>

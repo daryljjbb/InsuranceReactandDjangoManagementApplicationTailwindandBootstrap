@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -10,6 +12,11 @@
   </style>
 </head>
 <body>
+  <div style="text-align: center; margin-bottom: 20px;">
+    <img src="{{ logo_url }}" alt="Agency Logo" style="width: 150px;">
+
+
+  </div>
 
   <h1>Invoice {{ invoice.invoice_number }}</h1>
 
