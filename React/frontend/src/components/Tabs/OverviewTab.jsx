@@ -1,3 +1,5 @@
+import { FaMapMarkerAlt } from "react-icons/fa";
+
 export default function OverviewTab({ customer }) {
   if (!customer) {
     return (
@@ -35,10 +37,30 @@ ${c.city}, ${c.state} ${c.zip_code}`;
           <GlassCard label="Phone" value={customer.phone || "N/A"} />
           <GlassCard label="Email" value={customer.email || "N/A"} />
           <div className="md:col-span-2">
-            <GlassCard
+                        <GlassCard
             label="Address"
-            value={<div className="whitespace-pre-line">{formatAddress(customer)}</div>}
+            value={
+                <div className="flex items-start justify-between">
+                <div className="whitespace-pre-line">{formatAddress(customer)}</div>
+
+                {/* Google Maps Icon */}
+                {customer.address1 && (
+                    <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                        `${customer.address1}, ${customer.city}, ${customer.state} ${customer.zip_code}`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-800 ml-3 mt-1"
+                    title="View on Google Maps"
+                    >
+                    <FaMapMarkerAlt size={22} />
+                    </a>
+                )}
+                </div>
+            }
             />
+
 
         </div>
 

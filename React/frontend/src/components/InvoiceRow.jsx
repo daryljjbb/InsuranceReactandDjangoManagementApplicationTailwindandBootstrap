@@ -10,13 +10,14 @@ function InvoiceRow({ invoice, reloadCustomer }) {
     <>
       {/* MAIN ROW */}
       <tr
-        className="invoice-row"
+        className={`invoice-row ${expanded ? "invoice-row-expanded" : ""}`}
         onClick={() => setExpanded((prev) => !prev)}
         style={{ cursor: "pointer" }}
       >
         {/* ARROW COLUMN */}
         <td style={{ width: "30px" }}>
           <span
+            className="arrow-icon"
             style={{
               display: "inline-flex",
               transition: "transform 0.2s ease",
