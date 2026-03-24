@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Customer,Policy,Invoice, Payment
+from .models import Customer,Policy,Invoice, Payment, Document
 
 
 
@@ -92,3 +92,17 @@ class CustomerSerializer(serializers.ModelSerializer):
         model = Customer
         fields = "__all__"  # all customer fields
         read_only_fields = ["user"]
+
+
+class DocumentSerializer(serializers.ModelSerializer):
+    file_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Document
+        fields = ["id", "customer", "file_name", "file_url", "uploaded_at", "file"]
+
+    def get_file_url(self, obj):
+        request = self.context.get("request")
+        return request.build_absolute_uri(obj.file.url)
+
+

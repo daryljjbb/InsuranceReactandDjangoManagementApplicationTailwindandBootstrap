@@ -2,12 +2,14 @@
 # core/urls.py
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
+
 from . import views
-from .views import InvoiceViewSet, PaymentViewSet,invoice_pdf
+from .views import InvoiceViewSet, PaymentViewSet,invoice_pdf, DocumentViewSet
 
 router = DefaultRouter()
 router.register(r'invoices', InvoiceViewSet, basename='invoice')
 router.register(r'payments', PaymentViewSet, basename='payment')
+router.register("documents", DocumentViewSet)
 
 urlpatterns = [
     path('customers/', views.CustomerListCreateView.as_view()),
@@ -34,3 +36,4 @@ urlpatterns = [
     # and same for payments
     path('', include(router.urls)),
 ]
+

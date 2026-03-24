@@ -6,13 +6,13 @@ from rest_framework import filters # 1. Make sure this is imported
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models.functions import TruncMonth
 from django.db.models import Sum
-from .models import Customer, Policy, Invoice, Payment
+from .models import Customer, Policy, Invoice, Payment, Document
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.decorators import api_view, permission_classes
-from .serializers import CustomerSerializer, PolicySerializer, InvoiceSerializer, PaymentSerializer
+from .serializers import CustomerSerializer, PolicySerializer, InvoiceSerializer, PaymentSerializer, DocumentSerializer
 from rest_framework import viewsets
 
 # Create your views here.
@@ -169,6 +169,29 @@ class PaymentViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save()
+
+
+
+
+class DocumentViewSet(viewsets.ModelViewSet):
+    queryset = Document.objects.all()
+    serializer_class = DocumentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        qs = Document.objects.filter(user=self.request.user)
+        customer_id = self.request.query_params.get("customer")
+        if customer_id:
+            qs = qs.filter(customer_id=customer_id)
+        return qs
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["request"] = self.request
+        return context
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 
     

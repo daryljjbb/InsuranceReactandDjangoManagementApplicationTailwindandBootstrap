@@ -157,3 +157,30 @@ class Payment(models.Model):
         blank=True
     )
 
+
+class Document(models.Model):
+    customer = models.ForeignKey(
+        Customer,
+        related_name="documents",
+        on_delete=models.CASCADE
+    )
+    file = models.FileField(upload_to="customer_documents/")
+    file_name = models.CharField(max_length=255, blank=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+       # This links the invoice to a specific user
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.CASCADE,
+        related_name="documents",
+        null=True, # Allow existing ones to be null for now
+        blank=True
+    )
+
+    def save(self, *args, **kwargs):
+        if not self.file_name:
+            self.file_name = self.file.name
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.customer.first_name} {self.customer.last_name} - {self.file_name}"
