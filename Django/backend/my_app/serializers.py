@@ -96,13 +96,28 @@ class CustomerSerializer(serializers.ModelSerializer):
 
 class DocumentSerializer(serializers.ModelSerializer):
     file_url = serializers.SerializerMethodField()
+    file_type = serializers.SerializerMethodField()
+    file_size = serializers.SerializerMethodField()
 
     class Meta:
         model = Document
-        fields = ["id", "customer", "file_name", "file_url", "uploaded_at", "file"]
+        fields = [
+            "id",
+            "customer",
+            "file_name",
+            "file_url",
+            "uploaded_at",
+            "file",
+            "file_type",
+            "file_size",
+        ]
 
     def get_file_url(self, obj):
         request = self.context.get("request")
         return request.build_absolute_uri(obj.file.url)
 
+    def get_file_type(self, obj):
+        return obj.file.name.split(".")[-1].lower()
 
+    def get_file_size(self, obj):
+        return obj.file.size

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "../../api/axios";
-import { Table, Button, Spinner } from "react-bootstrap";
+import { Table, Button, Spinner, Modal} from "react-bootstrap";
 import UploadDocumentModal from "../UploadDocumentModal";
 import { toast } from "react-hot-toast";
 import {
@@ -100,6 +100,37 @@ const getFileIcon = (fileName) => {
   }
 };
 
+const [previewDoc, setPreviewDoc] = useState(null);
+const [showPreview, setShowPreview] = useState(false);
+
+const openPreview = (doc) => {
+  setPreviewDoc(doc);
+  setShowPreview(true);
+};
+
+const closePreview = () => {
+  setPreviewDoc(null);
+  setShowPreview(false);
+};
+
+
+const formatFileSize = (bytes) => {
+  if (!bytes) return "0 KB";
+  const kb = bytes / 1024;
+  if (kb < 1024) return `${kb.toFixed(1)} KB`;
+  const mb = kb / 1024;
+  return `${mb.toFixed(1)} MB`;
+};
+
+const getFileTypeLabel = (ext) => {
+  const type = ext.toLowerCase();
+  if (["jpg", "jpeg", "png", "gif", "heic"].includes(type)) return "Image";
+  if (["pdf"].includes(type)) return "PDF";
+  if (["doc", "docx"].includes(type)) return "Word";
+  if (["xls", "xlsx"].includes(type)) return "Excel";
+  return "File";
+};
+
 
   return (
     <div>
@@ -117,6 +148,7 @@ const getFileIcon = (fileName) => {
           <thead>
             <tr>
               <th>File Name</th>
+              <th>Size</th>
               <th>Uploaded</th>
               <th>Actions</th>
             </tr>
@@ -134,13 +166,23 @@ const getFileIcon = (fileName) => {
                   <td className="d-flex align-items-center gap-2">
                     {getFileIcon(doc.file_name)}
                     {doc.file_name}
+                    <span className="badge bg-light text-dark border">
+                    {getFileTypeLabel(doc.file_type)}
+                    </span>
+
                     </td>
+                  <td>{formatFileSize(doc.file_size)}</td>
 
                   <td>{new Date(doc.uploaded_at).toLocaleDateString()}</td>
                   <td>
-                    <a href={doc.file_url} target="_blank" rel="noreferrer" className="me-3">
-                        View
-                    </a>
+                   <Button
+                    variant="link"
+                    className="p-0 me-3"
+                    onClick={() => openPreview(doc)}
+                    >
+                    View
+                    </Button>
+
 
                     <Button
                         variant="danger"
@@ -197,6 +239,60 @@ const getFileIcon = (fileName) => {
             </div>
         </div>
         </div>
+        <Modal show={showPreview} onHide={closePreview} size="lg" centered>
+        <Modal.Header closeButton>
+            <Modal.Title>Preview Document</Modal.Title>
+        </Modal.Header>
+
+        <Modal.Body style={{ minHeight: "400px" }}>
+            {previewDoc && (() => {
+            const ext = previewDoc.file_type?.toLowerCase();
+
+            // IMAGE PREVIEW
+            if (["jpg", "jpeg", "png", "gif", "heic"].includes(ext)) {
+                return (
+                <img
+                    src={previewDoc.file_url}
+                    alt={previewDoc.file_name}
+                    className="img-fluid rounded"
+                />
+                );
+            }
+
+            // PDF PREVIEW
+            if (ext === "pdf") {
+                return (
+                <iframe
+                    src={previewDoc.file_url}
+                    title="PDF Preview"
+                    style={{ width: "100%", height: "70vh", border: "none" }}
+                />
+                );
+            }
+
+            // FALLBACK FOR OTHER FILE TYPES
+            return (
+                <div className="text-center py-4">
+                <p>No preview available for this file type.</p>
+                <Button
+                    variant="primary"
+                    href={previewDoc.file_url}
+                    target="_blank"
+                    rel="noreferrer"
+                >
+                    Download File
+                </Button>
+                </div>
+            );
+            })()}
+        </Modal.Body>
+
+        <Modal.Footer>
+            <Button variant="secondary" onClick={closePreview}>
+            Close
+            </Button>
+        </Modal.Footer>
+        </Modal>
 
     </div>
   );
