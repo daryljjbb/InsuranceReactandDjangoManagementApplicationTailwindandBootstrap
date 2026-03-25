@@ -102,9 +102,11 @@ const getFileIcon = (fileName) => {
 
 const [previewDoc, setPreviewDoc] = useState(null);
 const [showPreview, setShowPreview] = useState(false);
+const [currentIndex, setCurrentIndex] = useState(null);
 
-const openPreview = (doc) => {
+const openPreview = (doc, index) => {
   setPreviewDoc(doc);
+  setCurrentIndex(index);
   setShowPreview(true);
 };
 
@@ -112,6 +114,23 @@ const closePreview = () => {
   setPreviewDoc(null);
   setShowPreview(false);
 };
+
+const showNext = () => {
+  if (currentIndex < documents.length - 1) {
+    const nextIndex = currentIndex + 1;
+    setCurrentIndex(nextIndex);
+    setPreviewDoc(documents[nextIndex]);
+  }
+};
+
+const showPrev = () => {
+  if (currentIndex > 0) {
+    const prevIndex = currentIndex - 1;
+    setCurrentIndex(prevIndex);
+    setPreviewDoc(documents[prevIndex]);
+  }
+};
+
 
 
 const formatFileSize = (bytes) => {
@@ -145,59 +164,61 @@ const getFileTypeLabel = (ext) => {
         </div>
       ) : (
         <Table striped bordered hover>
-          <thead>
-            <tr>
-              <th>File Name</th>
-              <th>Size</th>
-              <th>Uploaded</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {documents.length === 0 ? (
-              <tr>
-                <td colSpan="3" className="text-center text-muted">
-                  No documents uploaded yet
-                </td>
-              </tr>
-            ) : (
-              documents.map(doc => (
-                <tr key={doc.id}>
-                  <td className="d-flex align-items-center gap-2">
-                    {getFileIcon(doc.file_name)}
-                    {doc.file_name}
-                    <span className="badge bg-light text-dark border">
-                    {getFileTypeLabel(doc.file_type)}
-                    </span>
+            <thead>
+                <tr>
+                <th>File Name</th>
+                <th>Size</th>
+                <th>Uploaded</th>
+                <th>Actions</th>
+                </tr>
+            </thead>
 
+            <tbody>
+                {documents.length === 0 ? (
+                <tr>
+                    <td colSpan="4" className="text-center text-muted">
+                    No documents uploaded yet
                     </td>
-                  <td>{formatFileSize(doc.file_size)}</td>
+                </tr>
+                ) : (
+                documents.map((doc, index) => (
+                    <tr key={doc.id}>
+                    <td className="d-flex align-items-center gap-2">
+                        {getFileIcon(doc.file_name)}
+                        {doc.file_name}
 
-                  <td>{new Date(doc.uploaded_at).toLocaleDateString()}</td>
-                  <td>
-                   <Button
-                    variant="link"
-                    className="p-0 me-3"
-                    onClick={() => openPreview(doc)}
-                    >
-                    View
-                    </Button>
+                        <span className="badge bg-light text-dark border">
+                        {getFileTypeLabel(doc.file_type)}
+                        </span>
+                    </td>
 
+                    <td>{formatFileSize(doc.file_size)}</td>
 
-                    <Button
+                    <td>{new Date(doc.uploaded_at).toLocaleDateString()}</td>
+
+                    <td>
+                        <Button
+                        variant="link"
+                        className="p-0 me-3"
+                        onClick={() => openPreview(doc, index)}
+                        >
+                        View
+                        </Button>
+
+                        <Button
                         variant="danger"
                         size="sm"
                         onClick={() => handleDelete(doc.id)}
-                    >
+                        >
                         Delete
-                    </Button>
+                        </Button>
                     </td>
-
-                </tr>
-              ))
-            )}
-          </tbody>
+                    </tr>
+                ))
+                )}
+            </tbody>
         </Table>
+
       )}
 
       <UploadDocumentModal
@@ -240,9 +261,28 @@ const getFileTypeLabel = (ext) => {
         </div>
         </div>
         <Modal show={showPreview} onHide={closePreview} size="lg" centered>
-        <Modal.Header closeButton>
+       <Modal.Header closeButton className="d-flex justify-content-between align-items-center">
             <Modal.Title>Preview Document</Modal.Title>
+
+            <div className="d-flex align-items-center gap-2">
+                <Button
+                variant="light"
+                disabled={currentIndex === 0}
+                onClick={showPrev}
+                >
+                ← Prev
+                </Button>
+
+                <Button
+                variant="light"
+                disabled={currentIndex === documents.length - 1}
+                onClick={showNext}
+                >
+                Next →
+                </Button>
+            </div>
         </Modal.Header>
+
 
         <Modal.Body style={{ minHeight: "400px" }}>
             {previewDoc && (() => {
