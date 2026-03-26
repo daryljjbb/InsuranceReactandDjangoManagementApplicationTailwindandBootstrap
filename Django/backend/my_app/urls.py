@@ -4,12 +4,14 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
 from . import views
-from .views import InvoiceViewSet, PaymentViewSet,invoice_pdf, DocumentViewSet
+from .views import InvoiceViewSet, PaymentViewSet,invoice_pdf, DocumentViewSet, SuspenseViewSet, SuspenseReportView, ExpirationsReportView, RenewalReportView
 
 router = DefaultRouter()
 router.register(r'invoices', InvoiceViewSet, basename='invoice')
 router.register(r'payments', PaymentViewSet, basename='payment')
 router.register("documents", DocumentViewSet)
+router.register("suspense", SuspenseViewSet)
+
 
 urlpatterns = [
     path('customers/', views.CustomerListCreateView.as_view()),
@@ -25,6 +27,10 @@ urlpatterns = [
     path('logout/', views.api_logout, name='api_logout'),
     path('register/', views.api_register, name='api_register'),
     path('me/', views.me, name='me'),
+
+    path("reports/suspense/", SuspenseReportView.as_view()),
+    path("reports/expirations/", ExpirationsReportView.as_view()),
+    path("reports/renewals/", RenewalReportView.as_view()),
 
     # ⭐ This exposes:
     # GET /invoices/

@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Customers from "./pages/Customers";
 import CustomerDetailPage from "./pages/CustomerDetailPage";
+import ReportsPage from "./pages/ReportsPage";
 import Login from "./pages/Login";
 import Register from "./pages/Registration";
 import Layout from "./components/Layout";   // <-- IMPORTANT
@@ -24,6 +25,7 @@ function App() {
         <Route element={isAuthenticated ? <Layout /> : <Navigate to="/login" />}>
           <Route path="/customers" element={<Customers />} />
           <Route path="/customers/:id" element={<CustomerDetailPage />} />
+          <Route path="/reports" element={<ReportsPage />} />
           {/* Add more pages here */}
         </Route>
 

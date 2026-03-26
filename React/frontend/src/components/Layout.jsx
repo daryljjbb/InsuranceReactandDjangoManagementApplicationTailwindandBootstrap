@@ -17,7 +17,10 @@ export default function Layout() {
             <Nav className="flex-column p-2">
               <LinkContainer to="/customers">
                 <Nav.Link>Customers</Nav.Link>
-              </LinkContainer>               
+              </LinkContainer>
+              <LinkContainer to="/reports">
+                <Nav.Link>Reports</Nav.Link>
+              </LinkContainer>                              
               {/* Add more sidebar links here */}
             </Nav>
           </Col>

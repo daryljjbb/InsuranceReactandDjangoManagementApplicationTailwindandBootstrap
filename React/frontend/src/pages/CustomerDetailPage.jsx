@@ -8,6 +8,7 @@ import OverviewTab from '../components/Tabs/OverviewTab';
 import PolicyTab from '../components/Tabs/PolicyTab';
 import InvoicesTab from '../components/Tabs/InvoicesTab';
 import DocumentsTab from '../components/Tabs/DocumentsTab';
+import SuspenseTab from "../components/Tabs/SuspenseTab";
 
 import { Button } from "react-bootstrap";
 import { Nav } from "react-bootstrap";
@@ -73,6 +74,9 @@ export default function CustomerDetailPage() {
         <Nav.Item>
             <Nav.Link eventKey="documents">Documents</Nav.Link>
         </Nav.Item>
+        <Nav.Item>
+            <Nav.Link eventKey="suspense">Suspense</Nav.Link> 
+        </Nav.Item>        
         </Nav>
 
 
@@ -97,6 +101,10 @@ export default function CustomerDetailPage() {
         )}
         {activeTab === "documents" && (
           <DocumentsTab customerId={customer.id} />
+        )}
+
+        {activeTab === "suspense" && (
+          <SuspenseTab customerId={customer.id} />
         )}
 
       </div>

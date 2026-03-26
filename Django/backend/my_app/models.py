@@ -184,3 +184,35 @@ class Document(models.Model):
 
     def __str__(self):
         return f"{self.customer.first_name} {self.customer.last_name} - {self.file_name}"
+
+
+class Suspense(models.Model):
+    STATUS_CHOICES = [
+        ("open", "Open"),
+        ("closed", "Closed"),
+        ("past_due", "Past Due"),
+    ]
+
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name="suspense_items")
+    suspense_date = models.DateField()
+    note = models.TextField(blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="open")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+        # This links the invoice to a specific user
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.CASCADE,
+        related_name="suspense_items",
+        null=True, # Allow existing ones to be null for now
+        blank=True
+    )
+
+    def save(self, *args, **kwargs):
+        # Auto-mark past due
+        if self.status == "open" and self.suspense_date < timezone.now().date():
+            self.status = "past_due"
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.customer} - {self.status}"

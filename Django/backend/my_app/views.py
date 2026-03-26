@@ -6,14 +6,17 @@ from rest_framework import filters # 1. Make sure this is imported
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models.functions import TruncMonth
 from django.db.models import Sum
-from .models import Customer, Policy, Invoice, Payment, Document
+from .models import Customer, Policy, Invoice, Payment, Document, Suspense
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.decorators import api_view, permission_classes
-from .serializers import CustomerSerializer, PolicySerializer, InvoiceSerializer, PaymentSerializer, DocumentSerializer
+from .serializers import CustomerSerializer, PolicySerializer, InvoiceSerializer, PaymentSerializer, DocumentSerializer, SuspenseSerializer
 from rest_framework import viewsets
+from datetime import timedelta
+from django.utils import timezone
+
 
 # Create your views here.
 # Create your views here.
@@ -140,6 +143,69 @@ class PolicyDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
 
 
+class ExpirationsReportView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        today = timezone.now().date()
+        soon = today + timedelta(days=30)
+
+        start_date = request.query_params.get("start_date", today)
+        end_date = request.query_params.get("end_date", soon)
+        policy_type = request.query_params.get("policy_type")
+        customer_id = request.query_params.get("customer")
+
+        qs = Policy.objects.filter(
+            customer__user=request.user,
+            expiration_date__range=[start_date, end_date]
+        )
+
+        if policy_type:
+            qs = qs.filter(policy_type=policy_type)
+
+        if customer_id:
+            qs = qs.filter(customer_id=customer_id)
+
+        qs = qs.order_by("expiration_date")
+
+        serializer = PolicySerializer(qs, many=True)
+        return Response(serializer.data)
+
+class RenewalReportView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        today = timezone.now().date()
+
+        start_date = request.query_params.get("start_date")
+        end_date = request.query_params.get("end_date")
+        policy_type = request.query_params.get("policy_type")
+        customer_id = request.query_params.get("customer")
+
+        qs = Policy.objects.filter(
+            customer__user=request.user
+        )
+
+        # Default: renewals this month
+        if not start_date and not end_date:
+            qs = qs.filter(
+                expiration_date__month=today.month,
+                expiration_date__year=today.year
+            )
+        else:
+            qs = qs.filter(expiration_date__range=[start_date, end_date])
+
+        if policy_type:
+            qs = qs.filter(policy_type=policy_type)
+
+        if customer_id:
+            qs = qs.filter(customer_id=customer_id)
+
+        qs = qs.order_by("expiration_date")
+
+        serializer = PolicySerializer(qs, many=True)
+        return Response(serializer.data)
+
 
 class InvoiceViewSet(viewsets.ModelViewSet):
     serializer_class = InvoiceSerializer
@@ -193,6 +259,30 @@ class DocumentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+
+class SuspenseViewSet(viewsets.ModelViewSet):
+    queryset = Suspense.objects.all()   # ← ADD THIS LINE
+    serializer_class = SuspenseSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        qs = Suspense.objects.filter(customer__user=self.request.user)
+        customer_id = self.request.query_params.get("customer")
+        if customer_id:
+            qs = qs.filter(customer_id=customer_id)
+        return qs.order_by("suspense_date")
+
+
+class SuspenseReportView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        items = Suspense.objects.filter(
+            customer__user=request.user
+        ).order_by("suspense_date")
+
+        serializer = SuspenseSerializer(items, many=True)
+        return Response(serializer.data)
 
     
 from django.template.loader import render_to_string

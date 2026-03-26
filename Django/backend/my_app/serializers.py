@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Customer,Policy,Invoice, Payment, Document
+from .models import Customer,Policy,Invoice, Payment, Document, Suspense
 
 
 
@@ -74,12 +74,15 @@ class InvoiceSerializer(serializers.ModelSerializer):
 # ----------------------------------------------------------------
 class PolicySerializer(serializers.ModelSerializer):
     invoices = InvoiceSerializer(many=True, read_only=True)
-    # This helps when you want to include nested relationships later (optional)
+    customer_name = serializers.SerializerMethodField()
+
     class Meta:
         model = Policy
-        fields = "__all__"  # all customer fields
+        fields = "__all__"  # includes customer_name now
         read_only_fields = ["user"]
 
+    def get_customer_name(self, obj):
+        return f"{obj.customer.first_name} {obj.customer.last_name}"
 
 
 # ----------------------------------------------------------------
@@ -121,3 +124,9 @@ class DocumentSerializer(serializers.ModelSerializer):
 
     def get_file_size(self, obj):
         return obj.file.size
+
+
+class SuspenseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Suspense
+        fields = "__all__"
