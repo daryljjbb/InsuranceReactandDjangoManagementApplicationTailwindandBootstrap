@@ -15,6 +15,9 @@ export default function Layout() {
             className="bg-light vh-100 p-3 shadow-sm d-none d-md-block"
           >
             <Nav className="flex-column p-2">
+              <LinkContainer to="/dashboard">
+                <Nav.Link>Dashboard</Nav.Link>
+              </LinkContainer>
               <LinkContainer to="/customers">
                 <Nav.Link>Customers</Nav.Link>
               </LinkContainer>

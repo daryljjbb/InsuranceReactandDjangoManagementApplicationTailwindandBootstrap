@@ -374,3 +374,63 @@ def api_register(request):
 
     return Response({"message": "User created successfully"}, status=201)
 
+
+class TodoSuspenseView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        today = timezone.now().date()
+
+        items = Suspense.objects.filter(
+            customer__user=request.user,
+            suspense_date__lte=today,
+            status__in=["open", "pending", "past_due"]
+        ).order_by("suspense_date")
+
+        serializer = SuspenseSerializer(items, many=True)
+        return Response(serializer.data)
+
+
+class TodoExpiringPoliciesView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        today = timezone.now().date()
+
+        policies = Policy.objects.filter(
+            customer__user=request.user,
+            expiration_date=today
+        ).order_by("expiration_date")
+
+        serializer = PolicySerializer(policies, many=True)
+        return Response(serializer.data)
+
+
+class TodoDueInvoicesView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # Use local date to avoid UTC mismatch issues
+        today = timezone.localdate()
+
+        # Base queryset: invoices due today OR overdue, with a balance remaining
+        base_filter = {
+            "due_date__lte": today,
+            "balance_due__gt": 0,
+        }
+
+        # Superusers see ALL invoices
+        if request.user.is_superuser:
+            invoices = Invoice.objects.filter(
+                **base_filter
+            ).order_by("due_date")
+
+        # Regular users only see invoices for their customers
+        else:
+            invoices = Invoice.objects.filter(
+                policy__customer__user=request.user,
+                **base_filter
+            ).order_by("due_date")
+
+        serializer = InvoiceSerializer(invoices, many=True)
+        return Response(serializer.data)

@@ -2,8 +2,8 @@ import { Table, Button, Spinner, Badge } from "react-bootstrap";
 import useSuspense from "../../hooks/useSuspense";
 import AddSuspenseModal from "../AddSuspenseModal";
 import EditSuspenseModal from "../EditSuspenseModal";
-import { useState } from "react";
-const SuspenseTab = ({ customerId }) => {
+import { useState, useEffect} from "react";
+const SuspenseTab = ({ customerId, itemFromUrl })  => {
   const {
     items,
     loading,
@@ -42,6 +42,20 @@ const SuspenseTab = ({ customerId }) => {
   }
 };
 
+useEffect(() => {
+  if (!itemFromUrl) return;
+  if (!items || items.length === 0) return;
+  console.log("SuspenseTab items:", items);
+  console.log("SuspenseTab loading:", loading);
+  console.log("SuspenseTab customerId:", customerId);
+
+  const el = document.getElementById(`suspense-${itemFromUrl}`);
+  if (el) {
+    el.scrollIntoView({ behavior: "smooth" });
+    el.classList.add("highlight-row");
+  }
+}, [itemFromUrl, items]);
+
 
   return (
     <div>
@@ -54,46 +68,47 @@ const SuspenseTab = ({ customerId }) => {
         <Spinner />
       ) : (
         <Table striped bordered hover>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Note</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {items.map((item) => (
-                <tr
-                key={item.id}
-                className={item.status === "past_due" ? "table-danger" : ""}
-                >
-                <td>{item.suspense_date}</td>
-                <td>{item.note}</td>
-                <td>{renderStatusBadge(item.status)}</td>
-
-                <td>
-                    <Button
-                    variant="link"
-                    onClick={() => setEditItemData(item)}
-                    >
-                    Edit
-                    </Button>
-
-                    <Button
-                    variant="danger"
-                    size="sm"
-                    onClick={() => removeItem(item.id)}
-                    >
-                    Delete
-                    </Button>
-                </td>
+            <thead>
+                <tr>
+                <th>Date</th>
+                <th>Note</th>
+                <th>Status</th>
+                <th>Actions</th>
                 </tr>
-            ))}
-        </tbody>
+            </thead>
 
+            <tbody>
+                {items.map((item) => (
+                <tr
+                    id={`suspense-${item.id}`}   // ⭐ ADD THIS LINE
+                    key={item.id}
+                    className={item.status === "past_due" ? "table-danger" : ""}
+                >
+                    <td>{item.suspense_date}</td>
+                    <td>{item.note}</td>
+                    <td>{renderStatusBadge(item.status)}</td>
+
+                    <td>
+                    <Button
+                        variant="link"
+                        onClick={() => setEditItemData(item)}
+                    >
+                        Edit
+                    </Button>
+
+                    <Button
+                        variant="danger"
+                        size="sm"
+                        onClick={() => removeItem(item.id)}
+                    >
+                        Delete
+                    </Button>
+                    </td>
+                </tr>
+                ))}
+            </tbody>
         </Table>
+
       )}
 
       <AddSuspenseModal

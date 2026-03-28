@@ -41,6 +41,8 @@ class PaymentSerializer(serializers.ModelSerializer):
 
 class InvoiceSerializer(serializers.ModelSerializer):
     payments = PaymentSerializer(many=True, read_only=True)
+    customer = serializers.IntegerField(source="policy.customer.id", read_only=True)
+
 
     class Meta:
         model = Invoice

@@ -55,39 +55,42 @@ export default function PolicyTab({
 
            <tbody>
                 {policies.map((policy) => (
-                    <tr key={policy.id}>
+                  <tr
+                    id={`policy-${policy.id}`}   // ⭐ ADD THIS
+                    key={policy.id}
+                  >
                     <td>{policy.policy_type}</td>
                     <td>{policy.policy_number}</td>
                     <td>{policy.effective_date}</td>
                     <td>{policy.expiration_date}</td>
                     <td>${policy.premium_amount}</td>
                     <td>
-                        <Button
+                      <Button
                         size="sm"
                         variant="outline-primary"
                         onClick={() => {
-                            setSelectedPolicy(policy);
-                            setShowEditModal(true);
+                          setSelectedPolicy(policy);
+                          setShowEditModal(true);
                         }}
                         className="me-2"
-                        >
+                      >
                         Edit
-                        </Button>
+                      </Button>
 
-                        <Button
+                      <Button
                         size="sm"
                         variant="outline-danger"
                         onClick={() => {
-                            setSelectedPolicy(policy);
-                            setShowDeleteModal(true);
+                          setSelectedPolicy(policy);
+                          setShowDeleteModal(true);
                         }}
-                        >
+                      >
                         Delete
-                        </Button>
+                      </Button>
                     </td>
-                    </tr>
+                  </tr>
                 ))}
-                </tbody>
+              </tbody>
 
 
             </Table>

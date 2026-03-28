@@ -12,10 +12,12 @@ function InvoiceRow({ invoice, reloadCustomer }) {
     <>
       {/* MAIN ROW */}
       <tr
+        id={`invoice-${invoice.id}`}   // ⭐ ADD THIS HERE
         className={`invoice-row ${expanded ? "invoice-row-expanded" : ""}`}
         onClick={() => setExpanded((prev) => !prev)}
         style={{ cursor: "pointer" }}
       >
+
         {/* ARROW COLUMN */}
         <td style={{ width: "30px" }}>
           <span

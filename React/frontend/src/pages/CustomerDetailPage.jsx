@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import useCustomers from "../hooks/useCustomers";
 import usePolicies from "../hooks/usePolicies";
 import useAuth from "../hooks/useAuth";
@@ -25,11 +26,36 @@ export default function CustomerDetailPage() {
     error,
   } = useCustomers(isAuthenticated, id); // Pass ID to fetch single customer
 
-  const [activeTab, setActiveTab] = useState("overview");
+  
+
 
   const [showRecordModal, setShowRecordModal] = useState(false);
 
   const { addPolicy, updatePolicy, deletePolicy } = usePolicies(isAuthenticated);
+
+
+
+  // For the To-Do List on the Dashboard, we want to be able to deep link to specific items. This reads the URL params and sets the active tab and item accordingly.
+  const [searchParams] = useSearchParams();
+  const tabFromUrl = searchParams.get("tab");
+  const itemFromUrl = searchParams.get("item");
+  const [activeTab, setActiveTab] = useState(tabFromUrl || "overview");
+
+ useEffect(() => {
+  if (!customer) return;
+
+  const validTabs = ["overview", "policies", "invoices", "documents", "suspense"];
+
+  // Normalize URL tab
+  let normalizedTab = tabFromUrl;
+  if (normalizedTab === "invoice") normalizedTab = "invoices";
+  if (normalizedTab === "policy") normalizedTab = "policies";
+
+  if (normalizedTab && validTabs.includes(normalizedTab)) {
+    setActiveTab(normalizedTab);
+  }
+}, [customer, tabFromUrl]);
+
 
 
 
@@ -104,7 +130,8 @@ export default function CustomerDetailPage() {
         )}
 
         {activeTab === "suspense" && (
-          <SuspenseTab customerId={customer.id} />
+          <SuspenseTab customerId={customer.id} itemFromUrl={itemFromUrl} />
+
         )}
 
       </div>
