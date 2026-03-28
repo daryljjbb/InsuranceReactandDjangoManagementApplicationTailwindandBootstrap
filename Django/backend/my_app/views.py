@@ -434,3 +434,42 @@ class TodoDueInvoicesView(APIView):
 
         serializer = InvoiceSerializer(invoices, many=True)
         return Response(serializer.data)
+
+
+class DashboardSummaryView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+
+        # Superuser sees everything
+        if user.is_superuser:
+            customers = Customer.objects.all()
+            policies = Policy.objects.all()
+        else:
+            customers = Customer.objects.filter(user=user)
+            policies = Policy.objects.filter(customer__user=user)
+
+        customer_count = customers.count()
+        policy_count = policies.count()
+
+        # Total premium across all policies
+        total_premium = policies.aggregate(
+            total=Sum("premium_amount")
+        )["total"] or 0
+
+        # Optional: invoice stats
+        invoices = Invoice.objects.filter(policy__in=policies)
+        unpaid_invoices = invoices.filter(balance_due__gt=0).count()
+        overdue_invoices = invoices.filter(
+            balance_due__gt=0,
+            due_date__lt=timezone.localdate()
+        ).count()
+
+        return Response({
+            "customer_count": customer_count,
+            "policy_count": policy_count,
+            "total_premium": total_premium,
+            "unpaid_invoices": unpaid_invoices,
+            "overdue_invoices": overdue_invoices,
+        })

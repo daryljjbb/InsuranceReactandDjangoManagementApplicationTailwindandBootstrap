@@ -4,7 +4,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
 from . import views
-from .views import InvoiceViewSet, PaymentViewSet,invoice_pdf, DocumentViewSet, SuspenseViewSet, SuspenseReportView, ExpirationsReportView, RenewalReportView, TodoSuspenseView, TodoExpiringPoliciesView, TodoDueInvoicesView
+from .views import InvoiceViewSet, PaymentViewSet,invoice_pdf, DocumentViewSet, SuspenseViewSet, SuspenseReportView, ExpirationsReportView, RenewalReportView, TodoSuspenseView, TodoExpiringPoliciesView, TodoDueInvoicesView, DashboardSummaryView
 
 router = DefaultRouter()
 router.register(r'invoices', InvoiceViewSet, basename='invoice')
@@ -16,6 +16,9 @@ router.register("suspense", SuspenseViewSet)
 urlpatterns = [
     path('customers/', views.CustomerListCreateView.as_view()),
     path('customers/<int:pk>/', views.CustomerDetailView.as_view()),
+
+    path("dashboard/summary/", DashboardSummaryView.as_view()),
+
 
     path('policies/', views.PolicyListCreateView.as_view()),
     path('policies/<int:pk>/', views.PolicyDetailView.as_view()),
