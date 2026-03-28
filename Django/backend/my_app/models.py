@@ -17,6 +17,7 @@ class Customer(models.Model):
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
@@ -77,7 +78,7 @@ class Invoice(models.Model):
         ('partial', 'Partial Paid'),
         ('paid', 'Paid in Full'),
     ]
-
+    created_at = models.DateTimeField(auto_now_add=True)
     policy = models.ForeignKey(Policy, related_name="invoices", on_delete=models.CASCADE)
     invoice_number = models.CharField(max_length=50, blank=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)

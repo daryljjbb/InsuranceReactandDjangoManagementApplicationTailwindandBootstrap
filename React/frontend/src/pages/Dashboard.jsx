@@ -8,6 +8,26 @@ export default function Dashboard() {
 
   if (!summary) return <div>Loading dashboard...</div>;
 
+
+  const getTrend = (current, previous) => {
+  if (current > previous) return "up";
+  if (current < previous) return "down";
+  return "neutral";
+};
+
+const getTrendPercent = (current, previous) => {
+  if (!previous || previous === 0) return "N/A";
+  const diff = current - previous;
+  const percent = (diff / previous) * 100;
+  return percent.toFixed(1);
+};
+
+console.log("Trend % customers:", getTrendPercent(summary.customer_count, summary.last_month_customers));
+console.log("Trend % policies:", getTrendPercent(summary.policy_count, summary.last_month_policies));
+console.log("Trend % premium:", getTrendPercent(summary.total_premium, summary.last_month_premium));
+console.log(summary);
+
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
 
@@ -16,21 +36,36 @@ export default function Dashboard() {
 
         {/* KPI CARDS */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <DashboardCard
-            title="Customers"
-            value={summary.customer_count}
-            icon={<Users />}
-          />
-          <DashboardCard
-            title="Policies"
-            value={summary.policy_count}
-            icon={<FileText />}
-          />
-          <DashboardCard
-            title="Total Premium"
-            value={`$${summary.total_premium.toFixed(2)}`}
-            icon={<DollarSign />}
-          />
+        <DashboardCard
+        title="Customers"
+        value={summary.customer_count}
+        icon={<Users />}
+        color="blue"
+        trend={getTrend(summary.customer_count, summary.last_month_customers)}
+        trendPercent={getTrendPercent(summary.customer_count, summary.last_month_customers)}
+        />
+
+        <DashboardCard
+        title="Policies"
+        value={summary.policy_count}
+        icon={<FileText />}
+        color="orange"
+        trend={getTrend(summary.policy_count, summary.last_month_policies)}
+        trendPercent={getTrendPercent(summary.policy_count, summary.last_month_policies)}
+        />
+
+        <DashboardCard
+        title="Total Premium"
+        value={`$${summary.total_premium.toFixed(2)}`}
+        icon={<DollarSign />}
+        color="green"
+        trend={getTrend(summary.total_premium, summary.last_month_premium)}
+        trendPercent={getTrendPercent(summary.total_premium, summary.last_month_premium)}
+        />
+
+
+
+
         </div>
 
         {/* MAIN CONTENT AREA */}

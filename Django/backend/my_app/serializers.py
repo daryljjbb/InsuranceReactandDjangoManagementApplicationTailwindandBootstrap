@@ -96,7 +96,7 @@ class CustomerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Customer
         fields = "__all__"  # all customer fields
-        read_only_fields = ["user"]
+        read_only_fields = ["user", "created_at"]
 
 
 class DocumentSerializer(serializers.ModelSerializer):

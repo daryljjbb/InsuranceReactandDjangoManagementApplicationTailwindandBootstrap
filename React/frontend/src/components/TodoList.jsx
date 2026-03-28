@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import api from "../api/axios";
 import { Link } from "react-router-dom";
+import { FileText, ShieldCheck, DollarSign } from "lucide-react";
 
 const TodoList = () => {
   const [items, setItems] = useState([]);
@@ -66,6 +67,19 @@ const TodoList = () => {
     });
   }, []);
 
+  const getIcon = (type) => {
+    switch (type) {
+      case "suspense":
+        return <FileText className="text-blue-600" size={20} />;
+      case "policies":
+        return <ShieldCheck className="text-orange-600" size={20} />;
+      case "invoices":
+        return <DollarSign className="text-green-600" size={20} />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="bg-white shadow p-4 rounded mb-6">
       <h3 className="text-xl font-semibold mb-3">To‑Do List</h3>
@@ -80,8 +94,10 @@ const TodoList = () => {
           to={`/customers/${item.customer}?tab=${item.type}&item=${item.id}`}
           className="flex items-center justify-between p-2 border-b hover:bg-gray-50"
         >
-          {/* 🔹 Apply truncation here */}
-          <span>{truncate(item.label, 40)}</span>
+          <div className="flex items-center gap-2">
+            {getIcon(item.type)}
+            <span>{truncate(item.label, 40)}</span>
+          </div>
 
           <span className="text-sm text-gray-500">{item.date}</span>
         </Link>

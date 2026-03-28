@@ -436,11 +436,21 @@ class TodoDueInvoicesView(APIView):
         return Response(serializer.data)
 
 
+from django.utils import timezone
+from django.db.models import Sum
+from datetime import timedelta
+
 class DashboardSummaryView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         user = request.user
+
+        # Date ranges
+        today = timezone.localdate()
+        first_day_this_month = today.replace(day=1)
+        last_day_last_month = first_day_this_month - timedelta(days=1)
+        first_day_last_month = last_day_last_month.replace(day=1)
 
         # Superuser sees everything
         if user.is_superuser:
@@ -450,26 +460,44 @@ class DashboardSummaryView(APIView):
             customers = Customer.objects.filter(user=user)
             policies = Policy.objects.filter(customer__user=user)
 
+        # Current counts
         customer_count = customers.count()
         policy_count = policies.count()
 
-        # Total premium across all policies
-        total_premium = policies.aggregate(
-            total=Sum("premium_amount")
-        )["total"] or 0
+        # Last month counts
+        last_month_customers = customers.filter(
+            created_at__date__range=[first_day_last_month, last_day_last_month]
+        ).count()
 
-        # Optional: invoice stats
+        last_month_policies = policies.filter(
+            effective_date__range=[first_day_last_month, last_day_last_month]
+        ).count()
+
+        # Premium totals
+        total_premium = policies.aggregate(total=Sum("premium_amount"))["total"] or 0
+
+        last_month_premium = policies.filter(
+            effective_date__range=[first_day_last_month, last_day_last_month]
+        ).aggregate(total=Sum("premium_amount"))["total"] or 0
+
+        # Invoice stats
         invoices = Invoice.objects.filter(policy__in=policies)
         unpaid_invoices = invoices.filter(balance_due__gt=0).count()
         overdue_invoices = invoices.filter(
             balance_due__gt=0,
-            due_date__lt=timezone.localdate()
+            due_date__lt=today
         ).count()
 
         return Response({
             "customer_count": customer_count,
+            "last_month_customers": last_month_customers,
+
             "policy_count": policy_count,
+            "last_month_policies": last_month_policies,
+
             "total_premium": total_premium,
+            "last_month_premium": last_month_premium,
+
             "unpaid_invoices": unpaid_invoices,
             "overdue_invoices": overdue_invoices,
         })
