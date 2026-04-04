@@ -245,10 +245,18 @@ class DocumentViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        qs = Document.objects.filter(user=self.request.user)
+        user = self.request.user
+
+        # Superuser sees ALL documents
+        if user.is_superuser:
+            qs = Document.objects.all()
+        else:
+            qs = Document.objects.filter(user=user)
+
         customer_id = self.request.query_params.get("customer")
         if customer_id:
             qs = qs.filter(customer_id=customer_id)
+
         return qs
 
     def get_serializer_context(self):
@@ -266,11 +274,20 @@ class SuspenseViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        qs = Suspense.objects.filter(customer__user=self.request.user)
+        user = self.request.user
+
+        # Superuser sees ALL suspense items
+        if user.is_superuser:
+            qs = Suspense.objects.all()
+        else:
+            qs = Suspense.objects.filter(customer__user=user)
+
         customer_id = self.request.query_params.get("customer")
         if customer_id:
             qs = qs.filter(customer_id=customer_id)
+
         return qs.order_by("suspense_date")
+
 
 
 class SuspenseReportView(APIView):

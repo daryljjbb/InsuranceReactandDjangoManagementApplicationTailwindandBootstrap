@@ -3,8 +3,10 @@ import { Modal } from "react-bootstrap";
 import AddPolicyForm from "../AddPolicyForm";
 import EditPolicyForm from "../EditPolicyForm";
 import DeletePolicyModal from "../DeletePolicyModal";
+import ViewPolicyForm from "../ViewPolicyForm";
 import PolicyCard from "../PolicyCard";
 import { Table, Button } from "react-bootstrap";
+import useAuth from  "../../hooks/useAuth";
 
 export default function PolicyTab({
   customer,
@@ -18,9 +20,12 @@ export default function PolicyTab({
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
   const [selectedPolicy, setSelectedPolicy] = useState(null);
 
   const policies = customer.policies || [];
+
+  const { isAuthenticated, isAdmin } = useAuth();
 
   return (
     <div className="space-y-10">
@@ -70,6 +75,21 @@ export default function PolicyTab({
                         variant="outline-primary"
                         onClick={() => {
                           setSelectedPolicy(policy);
+                          setShowViewModal(true);
+                        }}
+                        className="me-2"
+                      >
+                        View
+                      </Button>
+
+                      {isAdmin && (
+                    <>
+                      <span className="mx-2 text-muted">|</span>
+                      <Button
+                        size="sm"
+                        variant="outline-primary"
+                        onClick={() => {
+                          setSelectedPolicy(policy);
                           setShowEditModal(true);
                         }}
                         className="me-2"
@@ -87,6 +107,11 @@ export default function PolicyTab({
                       >
                         Delete
                       </Button>
+                    </>
+                  )}
+
+
+                     
                     </td>
                   </tr>
                 ))}
@@ -111,7 +136,28 @@ export default function PolicyTab({
           />
         </Modal.Body>
       </Modal>
+      
+      {/* View POLICY MODAL */}
+      {showViewModal && (
+        <Modal show={showViewModal} onHide={() => setShowViewModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>View Policy</Modal.Title>
+        </Modal.Header>
 
+        <Modal.Body>
+          <ViewPolicyForm
+            policy={selectedPolicy}
+            closeModal={() => setShowViewModal(false)}
+          />
+        </Modal.Body>
+
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowViewModal(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      )}
       {/* EDIT POLICY MODAL */}
       {showEditModal && (
         <Modal show onHide={() => setShowEditModal(false)}>
@@ -138,6 +184,8 @@ export default function PolicyTab({
           closeModal={() => setShowDeleteModal(false)}
         />
       )}
+
+       
     </div>
   );
 }

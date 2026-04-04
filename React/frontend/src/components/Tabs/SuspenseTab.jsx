@@ -2,7 +2,9 @@ import { Table, Button, Spinner, Badge } from "react-bootstrap";
 import useSuspense from "../../hooks/useSuspense";
 import AddSuspenseModal from "../AddSuspenseModal";
 import EditSuspenseModal from "../EditSuspenseModal";
+import ViewSuspenseForm from "../ViewSuspenseForm";
 import { useState, useEffect} from "react";
+import useAuth from  "../../hooks/useAuth";
 const SuspenseTab = ({ customerId, itemFromUrl })  => {
   const {
     items,
@@ -15,6 +17,11 @@ const SuspenseTab = ({ customerId, itemFromUrl })  => {
 
   const [showAdd, setShowAdd] = useState(false);
   const [editItemData, setEditItemData] = useState(null);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [viewItemData, setViewItemData] = useState(null);
+
+
+   const { isAuthenticated, isAdmin } = useAuth();
 
   const statusBadge = (status) => {
     switch (status) {
@@ -90,6 +97,19 @@ useEffect(() => {
 
                     <td>
                     <Button
+                      variant="link"
+                      onClick={() => {
+                        setViewItemData(item);   // ⭐ correct state
+                        setShowViewModal(true);
+                      }}
+                    >
+                      View
+                    </Button>
+
+                       {isAdmin && (
+                    <>
+                      <span className="mx-2 text-muted">|</span>
+                       <Button
                         variant="link"
                         onClick={() => setEditItemData(item)}
                     >
@@ -103,6 +123,8 @@ useEffect(() => {
                     >
                         Delete
                     </Button>
+                    </>
+                  )}
                     </td>
                 </tr>
                 ))}
@@ -124,6 +146,15 @@ useEffect(() => {
         onSave={editItem}
         item={editItemData}
       />
+      <ViewSuspenseForm
+        show={showViewModal}
+        onHide={() => {
+          setShowViewModal(false);
+          setViewItemData(null);   // ⭐ clear view item
+        }}
+        item={viewItemData}
+      />
+
     </div>
   );
 };

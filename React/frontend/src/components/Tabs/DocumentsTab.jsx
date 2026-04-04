@@ -10,7 +10,7 @@ import {
   AiFillFile
 } from "react-icons/ai";
 import useDocuments from "../../hooks/useDocuments";
-
+import useAuth from  "../../hooks/useAuth";
 const DocumentsTab = ({ customerId }) => {
   const {
     documents,
@@ -23,7 +23,7 @@ const DocumentsTab = ({ customerId }) => {
   const [showUpload, setShowUpload] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-
+  const { isAuthenticated, isAdmin } = useAuth();
   // -----------------------------
   // DELETE LOGIC (UI ONLY)
   // -----------------------------
@@ -179,13 +179,19 @@ const DocumentsTab = ({ customerId }) => {
                       View
                     </Button>
 
-                    <Button
+
+                       {isAdmin && (
+                    <>
+                      <span className="mx-2 text-muted">|</span>
+                      <Button
                       variant="danger"
                       size="sm"
                       onClick={() => requestDelete(doc.id)}
                     >
                       Delete
                     </Button>
+                    </>
+                  )}
                   </td>
                 </tr>
               ))
