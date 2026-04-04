@@ -329,18 +329,24 @@ def invoice_pdf(request, pk):
 
 
 @api_view(["GET"])
-@permission_classes([AllowAny]) # Changed from IsAuthenticated to AllowAny
+@permission_classes([AllowAny])
 def me(request):
     if request.user.is_authenticated:
         return Response({
             "username": request.user.username,
+            "first_name": request.user.first_name,
+            "last_name": request.user.last_name,
+            "email": request.user.email,
             "is_staff": request.user.is_staff,
-            "is_superuser": request.user.is_superuser
+            "is_superuser": request.user.is_superuser,
         })
-    # If not authenticated, return status 200 (Success) with empty data
+    
     return Response({
-        "username": "", 
-        "is_staff": False, 
+        "username": "",
+        "first_name": "",
+        "last_name": "",
+        "email": "",
+        "is_staff": False,
         "is_superuser": False
     }, status=200)
 
@@ -371,6 +377,8 @@ def api_logout(request):
 @permission_classes([AllowAny])
 def api_register(request):
     username = request.data.get('username')
+    first_name = request.data.get('first_name', '')
+    last_name = request.data.get('last_name', '')
     password = request.data.get('password')
     is_admin = request.data.get('is_admin', False)
 
@@ -381,8 +389,12 @@ def api_register(request):
         return Response({"error": "Username already exists"}, status=400)
 
     # Create the user
-    user = User.objects.create_user(username=username, password=password)
-    
+    user = User.objects.create_user(
+    username=username,
+    password=password,
+    first_name=first_name,
+    last_name=last_name
+)
     # If the checkbox was checked, make them a Staff/Superuser
     if is_admin:
         user.is_staff = True

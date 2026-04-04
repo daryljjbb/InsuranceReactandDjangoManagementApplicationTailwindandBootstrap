@@ -9,6 +9,10 @@ const Register = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+
+
   const handleRegister = async (e) => {
     e.preventDefault();
     setError("");
@@ -16,8 +20,11 @@ const Register = () => {
       await api.post("register/", { 
         username, 
         password, 
+        first_name: firstName,
+        last_name: lastName,
         is_admin: isAdmin 
       });
+
       alert("Registration successful! Please login.");
       navigate("/login");
     } catch (err) {
@@ -35,12 +42,30 @@ const Register = () => {
         <form onSubmit={handleRegister}>
           <div className="mb-3">
             <label className="form-label">Username</label>
-            <input 
-              className="form-control" 
+            <input
+              className="form-control"
               required
-              onChange={(e) => setUsername(e.target.value)} 
+              onChange={(e) => setUsername(e.target.value)}
             />
           </div>
+          <div className="mb-3">
+            <label className="form-label">First Name</label>
+            <input
+              className="form-control"
+              required
+              onChange={(e) => setFirstName(e.target.value)}
+            />
+          </div>
+
+          <div className="mb-3">
+            <label className="form-label">Last Name</label>
+            <input
+              className="form-control"
+              required
+              onChange={(e) => setLastName(e.target.value)}
+            />
+          </div>
+
           <div className="mb-3">
             <label className="form-label">Password</label>
             <input 
